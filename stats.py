@@ -3,7 +3,7 @@
 # Statistics in python
 #
 # AH 07-09-2018
-# Last update : 28-09-2018
+# Last update : 25-10-2018
 
 import numpy as np
 
@@ -51,22 +51,18 @@ def compute_image_rmse(im1, im2, nx, ny):
             rmse_im += np.linalg.norm(im1[i][j] - im2[i][j])**2
     return np.sqrt(rmse_im/(nx*ny))
 
-# Compute the column/line mean of a matrix without NaNs
-#
-def compute_mean(matrix, n, col, nozeros=True):
-    matrix_mean = []
-    for i in range(0, n):
-        if col :
-            if nozeros:
-                matrix_mean.append(np.nanmean(matrix[:,i]))
-            else:
-                matrix_mean.append(np.mean(matrix[:,i]))
-        else :
-            if nozeros:
-                matrix_mean.append(np.nanmean(matrix[i]))
-            else:
-                matrix_mean.append(np.mean(matrix[i]))
-    return matrix_mean
+def compute_mean(data, col, nozeros=True):
+    """ Compute the column/line mean of a matrix without NaNs
+    """
+    datamean = []
+    if not col: data = data
+    else: data = data.T
+    for i in range(0, data.shape[0]):
+        if not nozeros:
+            datamean.append(np.mean(data[i])) 
+        else:
+            datamean.append(np.nanmean(data[i]))
+    return datamean
 
 # Compute the column/line mean of a matrix without zeros
 #
@@ -87,18 +83,26 @@ def compute_mean0(matrix, n, col, nozeros=True):
     
 # Remove the column/line mean of a matrix
 #
-def remove_mean(matrix, t_mean, n, col):
+def remove_mean(data, mean, col):
+    if data.shape[0]>data.shape[1]:
+        n=data.shape[1]
+    else:
+        n=data.shape[0]
     if col: 
         for i in range(0, n):
-            matrix[:,i] -= t_mean[i]
+            data[:,i] -= mean[i]
     else:
         for i in range(0, n):
-            matrix[i] -= t_mean[i]
-    return matrix
+            data[i] -= mean[i]
+    return data
 
 # Add the column/line mean of a matrix
 #
-def add_mean(data, mean, n, col):
+def add_mean(data, mean, col):
+    if data.shape[0]>data.shape[1]:
+        n=data.shape[1]
+    else:
+        n=data.shape[0]
     if col:
         for i in range(0, n):
             if np.isnan(mean[i]):
